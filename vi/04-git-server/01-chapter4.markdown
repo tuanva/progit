@@ -1,20 +1,22 @@
-# Git on the Server #
+# Git trên Máy Chủ #
 
-At this point, you should be able to do most of the day-to-day tasks for which you’ll be using Git. However, in order to do any collaboration in Git, you’ll need to have a remote Git repository. Although you can technically push changes to and pull changes from individuals’ repositories, doing so is discouraged because you can fairly easily confuse what they’re working on if you’re not careful. Furthermore, you want your collaborators to be able to access the repository even if your computer is offline — having a more reliable common repository is often useful. Therefore, the preferred method for collaborating with someone is to set up an intermediate repository that you both have access to, and push to and pull from that. We’ll refer to this repository as a "Git server"; but you’ll notice that it generally takes a tiny amount of resources to host a Git repository, so you’ll rarely need to use an entire server for it.
+Đến thời điểm này, bạn nên có khả năng áp dụng Git vào trong các tác vụ hàng ngày. Tuy nhiên, để cộng tác với một thành viên khác sử dụng Git, bạn sẽ cần một kho chứa Git từ xa/trung tâm. Mặc dù, về mặt kỹ thuật bạn có thể thực hiện các thao tác cơ bản (kéo/đẩy - đọc/ghi) với các thay đổi sử dụng kho chứa cá nhân riêng của từng người, nhưng làm vậy thường khiến bạn nản chí vì nó rất dễ gây khó hiểu cho bạn về việc mà người kia đang làm nếu như bạn không chú ý/cẩn thận. Hơn nữa, bạn cũng muốn những người cộng tác với bạn có thể truy cập vào kho chứa ngay cả khi máy tính của bạn không hoạt động - sử dụng một kho chứa chung có khả năng tin cậy cao thường hữu ích hơn. Chính vì thế phương pháp được khuyến cáo cho việc cộng tác với một người nào đó là sử dụng một kho chứa trung gian mà cả hai cùng có thể truy cập vào, và có thể thực hiện được các thao tác đọc ghi trên đó. Chúng ta sẽ gọi kho chứa này là một "Máy chủ Git"; nhưng bạn sẽ dễ nhận ra rằng Git sử dụng một phần tài nguyên rất nhỏ để lưu trữ kho chứa, chính vì vậy rất hiếm khi cần thiết phải sử dụng cả một máy chủ (vật lý hoặc ảo) cho nó.
 
-Running a Git server is simple. First, you choose which protocols you want your server to communicate with. The first section of this chapter will cover the available protocols and the pros and cons of each. The next sections will explain some typical setups using those protocols and how to get your server running with them. Last, we’ll go over a few hosted options, if you don’t mind hosting your code on someone else’s server and don’t want to go through the hassle of setting up and maintaining your own server.
+Chạy một máy chủ Git rất đơn giản. Trước tiên bạn chọn giao thức giao tiếp mà bạn muốn cho máy chủ đó. Phần đầu tiên của chương này sẽ đề cập tới các giao thức hiện có cùng ưu nhược điểm của chúng. Các phần tiếp theo sẽ giải thích một số cài đặt đặc trưng sử dụng các giao thức đó và làm thế nào để máy chủ của bạn chạy được sử dụng chúng. Cuối cùng, chúng ta sẽ cùng điểm qua một số lựa chọn về hosting, nếu như bạn không ngại việc lưu trữ mã nguồn trên máy chủ của người khác và không muốn gặp phải các rắc rối về cài đặt cũng như bảo trì máy chủ riêng.
 
-If you have no interest in running your own server, you can skip to the last section of the chapter to see some options for setting up a hosted account and then move on to the next chapter, where we discuss the various ins and outs of working in a distributed source control environment.
+Nếu như bạn không có hứng thú với việc sử dụng máy chủ riêng, bạn có thể bỏ qua phần cuối cùng của chương này để xem một số lựa chọn cho việc cài đặt cho việc cài đặt tài khoản trên một dịch vụ cung cấp hosting và sau đó chuyển sang chương tiếp theo, nơi chúng ta sẽ thảo luận nhiều vấn đề đa dạng liên quan tới việc đọc ghi trên một môi trường quản lý phiên bản phân tán.
 
-A remote repository is generally a _bare repository_ — a Git repository that has no working directory. Because the repository is only used as a collaboration point, there is no reason to have a snapshot checked out on disk; it’s just the Git data. In the simplest terms, a bare repository is the contents of your project’s `.git` directory and nothing else.
+Một kho chứa từ xa thông thường là một _kho chứa rỗng_ - một kho chứa Git không có thư mục làm việc. Bởi vì nó chỉ được sử dụng cho mục đích cộng tác, không có lý do gì để có một snapshot đã được checkout trên máy tính; nó chỉ chứa dữ liệu Git mà thôi. Nói một cách đơn giản nhất, nó chỉ là một kho chứa rỗng - nơi để chứa nội dung dự án của bạn trong thư mục `.git` và không gì khác.
 
-## The Protocols ##
+## Các Giao Thức ##
 
-Git can use four major network protocols to transfer data: Local, Secure Shell (SSH), Git, and HTTP. Here we’ll discuss what they are and in what basic circumstances you would want (or not want) to use them.
+Git có thể sử dụng bốn giao thức mạng chính để truyền tải sử liệu đó là: Nội bộ, Secure Shell (SSH), Git, và HTTP. Ở đây chúng ta sẽ thảo luận xem chúng là gì và sử dụng hoặc không sử dụng chúng trong những hoàn cảnh nào.
 
-It’s important to note that with the exception of the HTTP protocols, all of these require Git to be installed and working on the server.
+Điều quan trọng cần chú ý là với ngoại lệ của các giao thức HTTP, tất cả các giao thức này đều yêu cầu Git được cài đặt và hoạt động trên máy chủ.
 
-### Local Protocol ###
+### Giao Thức Nội Bộ ###
+
+
 
 The most basic is the _Local protocol_, in which the remote repository is in another directory on disk. This is often used if everyone on your team has access to a shared filesystem such as an NFS mount, or in the less likely case that everyone logs in to the same computer. The latter wouldn’t be ideal, because all your code repository instances would reside on the same computer, making a catastrophic loss much more likely.
 
