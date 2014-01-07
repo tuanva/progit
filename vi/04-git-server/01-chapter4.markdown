@@ -36,41 +36,41 @@ Sau đó, bạn có thể đọc và ghi từ remote đó như làm việc trên
 
 #### Ưu Điểm ####
 
-Ưu điểm của các kho chứa "file-based"
+Ưu điểm của các kho chứa dạng "file-based" là rất đơn giản và tận dụng được các quyền hạn có sẵn trên hệ thống cũng như trong mạng nội bộ. Nếu như bạn đã có một hệ thống tập tin chia sẻ mà mọi thành viên đều có quyền truy cập, thì việc cài đặt một kho chứa trở nên rất dễ dàng. Bạn đặt kho chứa rỗng ở một nơi nào đó mà mọi người cùng có quyền truy cập và sau đó phân quyền đọc/ghi tương tự như với một thư mục chia sẻ thông thường. Chúng ta sẽ đề cập đến việc làm thế nào để xuất một bản sao của một kho chứa rỗng phục vụ riêng cho mục đích này ở phần sau, "Đưa Git lên máy chủ".
 
-The pros of file-based repositories are that they’re simple and they use existing file permissions and network access. If you already have a shared filesystem to which your whole team has access, setting up a repository is very easy. You stick the bare repository copy somewhere everyone has shared access to and set the read/write permissions as you would for any other shared directory. We’ll discuss how to export a bare repository copy for this purpose in the next section, “Getting Git on a Server.”
+Đây cũng là một lựa chọn tốt cho việc nhanh chóng tiếp nhận công việc từ một kho chứa đang hoạt động của một người khác. Nếu bạn và đồng nghiệp đang làm việc trên cùng một dự án và họ muốn bạn checkout một thứ gì đó, thì chạy một câu lệnh giống như `git pull /home/john/project` thường dễ dàng hơn so với việc họ phải đẩy lên máy chủ từ xa để bạn kéo về sau đó.
 
-This is also a nice option for quickly grabbing work from someone else’s working repository. If you and a co-worker are working on the same project and they want you to check something out, running a command like `git pull /home/john/project` is often easier than them pushing to a remote server and you pulling down.
+#### Nhược Điểm ####
 
-#### The Cons ####
+Nhược điểm của phương pháp này là các truy cập chia sẻ (shared access) nhìn chung khó cài đặt và truy cập hơn từ nhiều vị trí khác nhau hơn so với một truy cập mạng thông thường. Nếu bạn muốn đẩy dữ liệu từ máy tính xách tay khi bạn đang ở nhà thì phải bản kết nối đến ổ đĩa chia sẻ (mount remote disk), mà việc này thì thường khó khăn và chậm hơn so với một kết nối mạng thông thường.
 
-The cons of this method are that shared access is generally more difficult to set up and reach from multiple locations than basic network access. If you want to push from your laptop when you’re at home, you have to mount the remote disk, which can be difficult and slow compared to network-based access.
+Một điều quan trọng cần phải đề cập tới nữa đó là đây không phải là phương pháp nhanh nhất trong trường hợp sử dụng dữ liệu chia sẻ hay tương tự. Một kho chứa nội bộ chỉ thực sự nhanh nếu bạn truy cập được tới các dữ liệu đó nhanh. Kho chứa trên ổ đĩa mạng thường chậm hơn là kho chứa sử dụng giao thức SSH trên cùng một máy chủ, cho phép Git không cần thực hiện các thao tác đọc ghi lên ổ cứng thường xuyên trên mỗi hệ thống (máy khách).
 
-It’s also important to mention that this isn’t necessarily the fastest option if you’re using a shared mount of some kind. A local repository is fast only if you have fast access to the data. A repository on NFS is often slower than the repository over SSH on the same server, allowing Git to run off local disks on each system.
+### Giao Thức SSH ###
 
-### The SSH Protocol ###
+Chắc chắn giao thức phổ biến nhất cho Git là SSH. Bởi vì truy cập tới máy chủ thông qua SSH thường đã được cài đặt sẵn ở hầu hết mọi nơi - và nếu chưa thì cũng rất dễ dàng để thực hiện. SSH cũng là giao thức qua mạng mà bạn có thể dễ dàng đọc/ghi nhất. Hai giao thức còn lại (HTTP và Git) thông thường là chỉ-đọc, vì thế thậm chí các kho chứa của bạn có cung cấp giao thức này thì bạn vẫn cần sử dụng SSH cho việc ghi dữ liệu. SSH còn là một giao thức qua mạng có xác thực; và cũng vì nó được sử dụng rất rộng rãi nên về cơ bản nó dẫn dễ cài đặt cũng như sử dụng.
 
-Probably the most common transport protocol for Git is SSH. This is because SSH access to servers is already set up in most places — and if it isn’t, it’s easy to do. SSH is also the only network-based protocol that you can easily read from and write to. The other two network protocols (HTTP and Git) are generally read-only, so even if you have them available for the unwashed masses, you still need SSH for your own write commands. SSH is also an authenticated network protocol; and because it’s ubiquitous, it’s generally easy to set up and use.
-
-To clone a Git repository over SSH, you can specify ssh:// URL like this:
+Để clone một kho chứa Git thông qua SSH, bạn có thể chỉ định địa chỉ ssh:// như sau:
 
 	$ git clone ssh://user@server/project.git
 
-Or you can use the shorter scp-like syntax for SSH protocol:
+Hoặc bạn có thể sử dụng cú pháp giống-scp ngắn gọn hơn cho SSH như sau:
 
 	$ git clone user@server:project.git
 
-You can also not specify a user, and Git assumes the user you’re currently logged in as.
+Bạn cũng có thể không cần thiết phải chỉ rõ tên người dùng, Git sẽ ngầm hiểu là người dùng hiện tại của hệ thống.
 
-#### The Pros ####
+#### Ưu Điểm ####
 
-The pros of using SSH are many. First, you basically have to use it if you want authenticated write access to your repository over a network. Second, SSH is relatively easy to set up — SSH daemons are commonplace, many network admins have experience with them, and many OS distributions are set up with them or have tools to manage them. Next, access over SSH is secure — all data transfer is encrypted and authenticated. Last, like the Git and Local protocols, SSH is efficient, making the data as compact as possible before transferring it.
+Có rất nhiều ưu điểm khi sử dụng SSH. Điều đầu tiên dễ nhận thấy nhất là bạn phải sử dụng nó nếu như bạn muốn xác minh quyền ghi vào kho chứa của bạn qua mạng. Thứ hai là SSH rất dễ dàng cài đặt - những người thông thạo về SSH rất phổ biến, rất nhiều quản trị mạng có kinh nghiệm về nó, và nhiều phiên bản của các hệ điều hành đã tích hợp sẵn SSH hoặc là có công cụ hỗ trợ. Tiếp đến là, truy cập thông qua SSH được bảo mật - tất cả dữ liệu truyền tải qua giao thức này được mã hóa và xác thực người dùng. Cuối cùng, cũng giống như giao thức Git và Nội bộ, SSH rất hiệu quả, dữ liệu được nén tới mức tối đa có thể trước khi truyền đi.
 
-#### The Cons ####
+#### Nhược Điểm ####
 
-The negative aspect of SSH is that you can’t serve anonymous access of your repository over it. People must have access to your machine over SSH to access it, even in a read-only capacity, which doesn’t make SSH access conducive to open source projects. If you’re using it only within your corporate network, SSH may be the only protocol you need to deal with. If you want to allow anonymous read-only access to your projects, you’ll have to set up SSH for you to push over but something else for others to pull over.
+Nhược điểm của SSH là bạn không thể cung cấp truy cập ẩn danh cho kho chứa của bạn. Người dùng phải có quyền truy cập vào máy của bạn thông qua SSH mới có thể truy cập được vào kho chứa, thậm chỉ là chỉ-đọc, điều này khiến SSH không thuận tiện cho các dự án mã nguồn mở. Nếu bạn chỉ sử dụng nó cho mạng lưới cộng tác của bạn thì SSH có thể là giao thức duy nhất bạn cần biết. Nếu bạn muốn cho phép quyền truy cập chỉ-đọc ẩn danh trên dự án của bạn, bạn sẽ phải cài đặt SSH cho các thao tác ghi của riêng bạn và một giao thức khác cho việc đọc của mọi người.
 
-### The Git Protocol ###
+### Giao Thức Git ###
+
+Tiếp đến là giao thức Git. Đây là một giao thức đặc biệt được cung cấp sẵn trong Git; nó lắng nghe trên một cổng dành riêng (9418) cho nó, và cung cấp các chức năng tương tự như giao thức SSH, nhưng tuyệt đối không có xác thực. Để một kho chứa có thể truy cập được thông qua giao thức Git, bạn phải tạo một tập tin `git-export-daemon-ok` -  
 
 Next is the Git protocol. This is a special daemon that comes packaged with Git; it listens on a dedicated port (9418) that provides a service similar to the SSH protocol, but with absolutely no authentication. In order for a repository to be served over the Git protocol, you must create the `git-export-daemon-ok` file — the daemon won’t serve a repository without that file in it — but other than that there is no security. Either the Git repository is available for everyone to clone or it isn’t. This means that there is generally no pushing over this protocol. You can enable push access; but given the lack of authentication, if you turn on push access, anyone on the internet who finds your project’s URL could push to your project. Suffice it to say that this is rare.
 
