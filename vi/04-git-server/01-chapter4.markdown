@@ -16,27 +16,27 @@ Git có thể sử dụng bốn giao thức mạng chính để truyền tải s
 
 ### Giao Thức Nội Bộ ###
 
+Giao thức cơ bản nhất là _giao thức nội bộ_, trong đó kho chứa từ xa chính là một thư mục khác trên máy tính. Giao thức này thường được sử dụng nếu như tất cả thành viên trong nhóm đều có quyền truy cập vào một hệ thống chia sẻ tập tin ví dụ như một ổ đĩa mạng (NFS mount), hoặc trường hợp ít phổ biến hơn là tất cả mọi người truy cập vào cùng một máy tính. Trường hợp thứ hai không phải là một lựa chọn lý tưởng, bởi vì tất cả kho chứa của mã nguồn đều nằm trên cùng một máy tính, việc mất dữ liệu sẽ dễ xảy ra hơn cũng như nguy hiểm hơn.
 
-
-The most basic is the _Local protocol_, in which the remote repository is in another directory on disk. This is often used if everyone on your team has access to a shared filesystem such as an NFS mount, or in the less likely case that everyone logs in to the same computer. The latter wouldn’t be ideal, because all your code repository instances would reside on the same computer, making a catastrophic loss much more likely.
-
-If you have a shared mounted filesystem, then you can clone, push to, and pull from a local file-based repository. To clone a repository like this or to add one as a remote to an existing project, use the path to the repository as the URL. For example, to clone a local repository, you can run something like this:
+Nếu như bạn có một hệ thống chia sẻ tập tin, bạn có thể clone, đọc, và ghi từ một kho chứa nội bộ. Để clone một kho chứa như thế này hoặc thêm chúng vào với vai trò là một remote cho một dự án đã có sẵn, thì bạn có thể sử dụng đường dẫn trực tiếp tới đó như là địa chỉ URL. Ví dụ để clone một kho chứa nội bộ, bạn có thể chạy lệnh sau:
 
 	$ git clone /opt/git/project.git
 
-Or you can do this:
+Hoặc theo cách này:
 
 	$ git clone file:///opt/git/project.git
 
-Git operates slightly differently if you explicitly specify `file://` at the beginning of the URL. If you just specify the path, and the source and the destination are on the same filesystem, Git tries to hardlink the objects it needs. If they are not on the same filesystem, it will copy the objects it needs using the system's standard copying functionality. If you specify `file://`, Git fires up the processes that it normally uses to transfer data over a network which is generally a lot less efficient method of transferring the data. The main reason to specify the `file://` prefix is if you want a clean copy of the repository with extraneous references or objects left out — generally after an import from another version-control system or something similar (see Chapter 9 for maintenance tasks). We’ll use the normal path here because doing so is almost always faster.
+Git hoạt động khác biệt một chút nếu bạn chỉ rõ `file://` ở đầu địa chỉ URL. Nếu bạn chỉ sử dụng đường dẫn, cộng thêm việc mã nguồn và đích đến nằm cùng trên một hệ thống tập tin (filesystem), Git sẽ cố gắng cố định (hardlink) các đối tượng mà nó cần. Nếu chung không nằm cùng trên một hệ thống tập tin, nó sẽ sao chép các đối tượng cần thiết sử dụng chức năng sao chép chuẩn của hệ thống. Nếu bạn chỉ định `file://`, Git sẽ khởi động các quá trình truyền tải dữ liệu qua mạng như thường lệ, tuy nhiên phương pháp này thường kém hiệu quả hơn. Lý do chính để chỉ định tiền tố `file://` là chỉ khi bạn muốn một bản sao "sạch" của kho chứa với các tham chiếu bên ngoài hoặc các đối tượng được lưu trữ ở ngoài - thường thì sau một lần nhập vào từ một hệ thống quản lý phiên bản khác hoặc tương tự (xem Chương 9 về các thao tác bảo trì). Chúng ta sẽ sử dụng đường dẫn thông thường ở đây vì nó luôn nhanh hơn.
 
-To add a local repository to an existing Git project, you can run something like this:
+Để thêm một kho chứa nội bộ vào dự án đã tồn tại, bạn có thể chạy lệnh sau:
 
 	$ git remote add local_proj /opt/git/project.git
 
-Then, you can push to and pull from that remote as though you were doing so over a network.
+Sau đó, bạn có thể đọc và ghi từ remote đó như làm việc trên mạng.
 
-#### The Pros ####
+#### Ưu Điểm ####
+
+Ưu điểm của các kho chứa "file-based"
 
 The pros of file-based repositories are that they’re simple and they use existing file permissions and network access. If you already have a shared filesystem to which your whole team has access, setting up a repository is very easy. You stick the bare repository copy somewhere everyone has shared access to and set the read/write permissions as you would for any other shared directory. We’ll discuss how to export a bare repository copy for this purpose in the next section, “Getting Git on a Server.”
 
