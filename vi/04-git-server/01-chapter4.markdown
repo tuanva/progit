@@ -70,28 +70,27 @@ Nhược điểm của SSH là bạn không thể cung cấp truy cập ẩn dan
 
 ### Giao Thức Git ###
 
-Tiếp đến là giao thức Git. Đây là một giao thức đặc biệt được cung cấp sẵn trong Git; nó lắng nghe trên một cổng dành riêng (9418) cho nó, và cung cấp các chức năng tương tự như giao thức SSH, nhưng tuyệt đối không có xác thực. Để một kho chứa có thể truy cập được thông qua giao thức Git, bạn phải tạo một tập tin `git-export-daemon-ok` -  
+Tiếp đến là giao thức Git. Đây là một giao thức đặc biệt được cung cấp sẵn trong Git; nó lắng nghe trên một cổng dành riêng (9418) cho nó, và cung cấp các chức năng tương tự như giao thức SSH, nhưng tuyệt đối không có xác thực. Để một kho chứa có thể truy cập được thông qua giao thức Git, bạn phải tạo một tập tin `git-export-daemon-ok` - một kho chứa sẽ không thể hoạt động nếu không như không có tập tin này - nhưng khác hơn là không có bảo mật. Hoặc là kho chứa Git có thể được clone hoặc không. Điều này có nghĩa về cơ bản không có các thao tác ghi (push) trong giao thức này. Bạn có thể kích hoạt tính năng push; nhưng sẽ không có xác thực, khi bạn kích hoạt tính năng này lên, bất kỳ ai trên Internet cũng có thể push vào dự án của bạn miễn là người ta biết được đường dẫn tới dự án đó. Thực tế mà nói thì trường hợp này rất hiếm xảy ra.
 
-Next is the Git protocol. This is a special daemon that comes packaged with Git; it listens on a dedicated port (9418) that provides a service similar to the SSH protocol, but with absolutely no authentication. In order for a repository to be served over the Git protocol, you must create the `git-export-daemon-ok` file — the daemon won’t serve a repository without that file in it — but other than that there is no security. Either the Git repository is available for everyone to clone or it isn’t. This means that there is generally no pushing over this protocol. You can enable push access; but given the lack of authentication, if you turn on push access, anyone on the internet who finds your project’s URL could push to your project. Suffice it to say that this is rare.
+#### Ưu Điểm ####
 
-#### The Pros ####
+Giao thức Git hiện tại là giao thức nhanh nhất tồn tại. Nếu như bạn có một dự án công khai có tần xuất đọc ghi cao hoặc một dự án lớn mà không yêu cầu xác thực người dùng cho việc đọc, thì chắc chắn bạn sẽ cần cài đặt một Git daemon để đáp ứng cho dự án đó. Nó sử dụng cơ chế truyền tải dữ liệu giống như SSH nhưng không chịu ảnh hưởng của mã hóa và xác thực.
 
-The Git protocol is the fastest transfer protocol available. If you’re serving a lot of traffic for a public project or serving a very large project that doesn’t require user authentication for read access, it’s likely that you’ll want to set up a Git daemon to serve your project. It uses the same data-transfer mechanism as the SSH protocol but without the encryption and authentication overhead.
+#### Nhược Điểm ####
 
-#### The Cons ####
+Điểm bất lợi của giao thức Git là không hỗ trợ xác thực. Thông thường thì Git không được sử dụng là giao thức duy nhất để truy cập vào một dự án. Nhìn chung, bạn nên dùng chung với giao thức SSH cho một số lập trình viên có quyền ghi và sử dụng `git://` cho người dùng chỉ có quyền đọc. Nó cũng là giao thức khó cài đặt nhất. Nó phải chạy một chương trình quản lý được thiết kế riêng (daemon) - chúng ta sẽ xem ví dụ cài đặt nó trong phần "Gitosis" của chương này - nó yêu cầu phải cấu hình `xinetd` hoặc tương tự, một việc không phải lúc nào cũng dễ dàng. Nó cũng đòi hỏi giao tiếp với cổng 9418 thông qua tường lửa, cổng này thường không được cho phép do không phải là một cổng giao tiếp chuẩn. 
 
-The downside of the Git protocol is the lack of authentication. It’s generally undesirable for the Git protocol to be the only access to your project. Generally, you’ll pair it with SSH access for the few developers who have push (write) access and have everyone else use `git://` for read-only access.
-It’s also probably the most difficult protocol to set up. It must run its own daemon, which is custom — we’ll look at setting one up in the “Gitosis” section of this chapter — it requires `xinetd` configuration or the like, which isn’t always a walk in the park. It also requires firewall access to port 9418, which isn’t a standard port that corporate firewalls always allow. Behind big corporate firewalls, this obscure port is commonly blocked.
+### Giao Thức HTTP/S ###
 
-### The HTTP/S Protocol ###
-
-Last we have the HTTP protocol. The beauty of the HTTP or HTTPS protocol is the simplicity of setting it up. Basically, all you have to do is put the bare Git repository under your HTTP document root and set up a specific `post-update` hook, and you’re done (See Chapter 7 for details on Git hooks). At that point, anyone who can access the web server under which you put the repository can also clone your repository. To allow read access to your repository over HTTP, do something like this:
+Cuối cùng là giao thức HTTP. Điểm nổi bật của giao thức HTTP hoặc HTTPS là sự đơn giản trong việc cài đặt. Cơ bản, tất cả những gì bạn cần phải làm là đặt kho chứa Git rỗng vào trong thư mục gốc của trang web và cài đặt một `post-update` hook (móc) riêng (xem chi tiết về Git hooks trong Chương 7). Bất kỳ ai có quyền truy cập vào máy chủ web nơi đặt kho chứa cũng có thể tạo bản sao kho chứa đó. Để cho phép đọc thông qua HTTP, bạn chạy lệnh sau: 
 
 	$ cd /var/www/htdocs/
 	$ git clone --bare /path/to/git_project gitproject.git
 	$ cd gitproject.git
 	$ mv hooks/post-update.sample hooks/post-update
 	$ chmod a+x hooks/post-update
+
+
 
 That’s all. The `post-update` hook that comes with Git by default runs the appropriate command (`git update-server-info`) to make HTTP fetching and cloning work properly. This command is run when you push to this repository over SSH; then, other people can clone via something like
 
