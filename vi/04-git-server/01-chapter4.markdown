@@ -90,91 +90,91 @@ Cuối cùng là giao thức HTTP. Điểm nổi bật của giao thức HTTP ho
 	$ mv hooks/post-update.sample hooks/post-update
 	$ chmod a+x hooks/post-update
 
-
-
-That’s all. The `post-update` hook that comes with Git by default runs the appropriate command (`git update-server-info`) to make HTTP fetching and cloning work properly. This command is run when you push to this repository over SSH; then, other people can clone via something like
+`post-update` hook trong Git chạy lệnh tương ứng (`git update-server-info`) để việc truy xuất cũng như sao chép thông qua HTTP được thực hiện một cách chính xác. Lệnh này được chạy khi bạn push vào kho chứa thông qua SSH; sau đó, mọi người có thể clone như sau: 
 
 	$ git clone http://example.com/gitproject.git
 
-In this particular case, we’re using the `/var/www/htdocs` path that is common for Apache setups, but you can use any static web server — just put the bare repository in its path. The Git data is served as basic static files (see Chapter 9 for details about exactly how it’s served).
+Trong trường hợp cụ thể này, chúng ta đang sử dụng đường dẫn `/var/www/htdocs` phổ biến của cho Apache, nhưng bạn có thể sử dụng bất kỳ máy chủ web tĩnh nào (static web server) - chỉ cần đặt kho chứa rỗng vào trong đường dẫn đó. Dữ liệu của Git được cung cấp như là các tập tin tĩnh cơ bản (xem chi tiết hơn ở Chương 9).
 
-It’s possible to make Git push over HTTP as well, although that technique isn’t as widely used and requires you to set up complex WebDAV requirements. Because it’s rarely used, we won’t cover it in this book. If you’re interested in using the HTTP-push protocols, you can read about preparing a repository for this purpose at `http://www.kernel.org/pub/software/scm/git/docs/howto/setup-git-server-over-http.txt`. One nice thing about making Git push over HTTP is that you can use any WebDAV server, without specific Git features; so, you can use this functionality if your web-hosting provider supports WebDAV for writing updates to your web site.
+Chúng ta cũng có thể thực hiện Git push thông qua HTTP, tuy rằng phương pháp này không được sử dụng một cách rộng rãi và nó yêu cầu bạn phải cài đặt WebDAV rất phức tạp. Chính vì không được sử dụng rộng rãi nên chúng ta sẽ không đề cập đến trong sách này. Nếu bạn quan tâm đến sử dụng giao thức HTTP-push, bạn có thể đọc thêm về việc cấu hình kho chứa riêng cho mục đích này tại `http://www.kernel.org/pub/software/scm/git/docs/howto/setup-git-server-over-http.txt`. Một điều thú vị về push thông qua HTTP là bạn của thể sử dụng bất kỳ máy chủ WebDAV nào, mà không cần đến các tính năng của Git; do đó bạn có thể sử dụng tính năng này nếu như máy chủ web của bạn có hỗ trợ WebDAV cho việc cập nhật dữ liệu của trang web.
 
-#### The Pros ####
+#### Ưu Điểm ####
 
-The upside of using the HTTP protocol is that it’s easy to set up. Running the handful of required commands gives you a simple way to give the world read access to your Git repository. It takes only a few minutes to do. The HTTP protocol also isn’t very resource intensive on your server. Because it generally uses a static HTTP server to serve all the data, a normal Apache server can serve thousands of files per second on average — it’s difficult to overload even a small server.
+Ưu điểm của việc sử dụng giao thức HTTP là nó rất dễ cài đặt. Chỉ cần thực thi một vài câu lệnh cần thiết là bạn đã có thể cung cấp truy cập vào kho chứa Git của bạn cho tất cả người dùng. Thực hiện việc này chỉ yêu cầu vài phút. Giao thức HTTP cũng không sử dụng quá nhiều tài nguyên trên máy chủ của bạn. Vì cơ bản nó sử dụng một máy chủ HTTP tĩnh để cung cấp toàn bộ dữ liệu, một máy chủ Apache thông thường có thể phục vụ trung bình hàng ngàn tập tin trên một giây - vì thế việc quá tải gần như không xảy ra, thậm chí là với máy chủ nhỏ.
 
-You can also serve your repositories read-only over HTTPS, which means you can encrypt the content transfer; or you can go so far as to make the clients use specific signed SSL certificates. Generally, if you’re going to these lengths, it’s easier to use SSH public keys; but it may be a better solution in your specific case to use signed SSL certificates or other HTTP-based authentication methods for read-only access over HTTPS.
+Bạn cũng có thể cho phép truy cập đến các kho chứa với quyền chỉ đọc thông qua HTTPS, có nghĩa là bạn có thể mã hóa các nội dung được truyền tải; hoặc nâng cao hơn nữa là bạn có thể yêu cầu các máy khách sử dụng một chứng thực SSL đã được xác nhận. Nhìn chung, nếu bạn theo phương pháp này, nó sẽ dễ dàng hơn việc sử dụng khóa SSH công khai; nhưng sử dụng chứng thực SSL đã được xác nhận hoặc các phương pháp xác thực khác dựa trên nền HTTP cho các thao tác chỉ đọc thông qua HTTPS cũng có thể là giải pháp tốt trong một số trường hợp cụ thể. 
 
-Another nice thing is that HTTP is such a commonly used protocol that corporate firewalls are often set up to allow traffic through this port.
+Một điều thú vị nữa là HTTP là một giao thức phổ biến được sử dụng rất rộng rãi nên hầu hết các tường lửa đã được cấu hình sẵn cho phép truyền tải dữ liệu thông qua các cổng này. 
 
-#### The Cons ####
+#### Nhược Điểm ####
 
-The downside of serving your repository over HTTP is that it’s relatively inefficient for the client. It generally takes a lot longer to clone or fetch from the repository, and you often have a lot more network overhead and transfer volume over HTTP than with any of the other network protocols. Because it’s not as intelligent about transferring only the data you need — there is no dynamic work on the part of the server in these transactions — the HTTP protocol is often referred to as a _dumb_ protocol. For more information about the differences in efficiency between the HTTP protocol and the other protocols, see Chapter 9.
+Điểm bất cập của việc cho phép truy cập vào kho chứa thông qua HTTP là nó tương đối không hiệu quả đối với máy khác. Nhìn chung thời gian sao chép cũng như truy xuất dữ liệu thường diễn ra lâu hơn, và tình trạng quá tải cũng thường xuyên xảy ra hơn so với bất cứ giao thức mạng nào khác. Bởi vì nó không thực sự thông minh để chỉ truyền tải các dữ liệu cần thiết - không có xử lý động ở phía máy chủ trong các lần truyền tải dữ liệu này - giao thức HTTP thường được nhắc đến như là một giao thức _tồi_. Chi tiết hơn sự khác nhau về mặt hiệu quả giữa giao thức HTTP và các giao thức khác sẽ được trình bày trong Chương 9.
 
-## Getting Git on a Server ##
+## Cài Đặt Git trên Máy Chủ ##
 
-In order to initially set up any Git server, you have to export an existing repository into a new bare repository — a repository that doesn’t contain a working directory. This is generally straightforward to do.
-In order to clone your repository to create a new bare repository, you run the clone command with the `--bare` option. By convention, bare repository directories end in `.git`, like so:
+Bước đầu để cài đặt bất kỳ một máy chủ Git nào là bạn phải xuất một kho chứa có sẵn ra thành một kho chứa rỗng - kho chứa không bao gồm thư mục làm việc. Thực hiện việc này thường khá đơn giản.
+Để clone kho chứa của bạn nhằm mục địch tạo một kho chứa rỗng mới, bạn chạy lệnh clone với tham số `--bare`. Để cho thuận tiện, các thư mục của kho chứa rỗng được lưu vào trong thư mục `.git`, như sau:
 
 	$ git clone --bare my_project my_project.git
 	Initialized empty Git repository in /opt/projects/my_project.git/
 
-The output for this command is a little confusing. Since `clone` is basically a `git init` then a `git fetch`, we see some output from the `git init` part, which creates an empty directory. The actual object transfer gives no output, but it does happen. You should now have a copy of the Git directory data in your `my_project.git` directory.
+Thông báo đầu ra của lệnh này hơi khó hiểu một chút. Vì cơ bản lệnh `clone` tương đương với `git init` và sau đó là `git fetch`, chúng ta thấy một phần thông tin từ lệnh `git part`, phần tạo thư mục trống. Phần truyền tải dữ liệu thực thì lại không hiện thị thông báo cho bạn, mặc dù nó vẫn diễn ra. Bạn sẽ có một bản sao của thư mục chứa dữ liệu của Git trong thư mục `my_project.git`.
 
-This is roughly equivalent to something like
+Nó gần tương đương với việc thực hiện lệnh sau:
 
 	$ cp -Rf my_project/.git my_project.git
 
-There are a couple of minor differences in the configuration file; but for your purpose, this is close to the same thing. It takes the Git repository by itself, without a working directory, and creates a directory specifically for it alone.
+Có một vài sự khác biệt nho nhỏ trong tập tin cấu hình; nhưng với mục đích của bạn thì chúng gần như giống nhau hoàn toàn. Nó chỉ lấy thư mục Git chứ không lấy thư mục làm việc của bạn, và tạo một thư mục riêng cho nó.
 
-### Putting the Bare Repository on a Server ###
+### Đưa Kho Chứa Rỗng lên Máy Chủ ###
 
-Now that you have a bare copy of your repository, all you need to do is put it on a server and set up your protocols. Let’s say you’ve set up a server called `git.example.com` that you have SSH access to, and you want to store all your Git repositories under the `/opt/git` directory. You can set up your new repository by copying your bare repository over:
+Khi bạn đã có một bản sao rỗng của kho chứa, tất cả những gì bạn cần phải làm là đưa nó lên máy chủ và cấu hình giao thức truy cập tới nó. Giả sửa bạn đã cài đặt một máy chủ mà bạn có quyền truy cập thông qua SSH có tên `git.example.com` và bạn muốn lưu trữ toàn bộ các kho chứa Git của bạn vào trong thư mục `/opt/git`. Bạn có thể cài đặt kho chứa mới bằng việc copy kho chứa rỗng của bạn lên máy chủ đó.
 
 	$ scp -r my_project.git user@git.example.com:/opt/git
 
-At this point, other users who have SSH access to the same server which has read-access to the `/opt/git` directory can clone your repository by running
+Tại thời điểm này, những người dùng khác cũng có quyền truy cập vào máy chủ này và quyền đọc thư mục `/opt/git` thông qua SSH có thể clone kho chứa của bạn bằng cách chạy lệnh sau:
 
 	$ git clone user@git.example.com:/opt/git/my_project.git
 
-If a user SSHs into a server and has write access to the `/opt/git/my_project.git` directory, they will also automatically have push access.  Git will automatically add group write permissions to a repository properly if you run the `git init` command with the `--shared` option.
+Nếu một người dùng SSH vào máy chủ này và họ có quyền ghi vào thư mục `/opt/git/my_project.git`, thì có nghĩa là họ mặc định sẽ có quyền push. Git sẽ tự động thêm quyền ghi trên kho chứa nếu bạn chạy lệnh `git init` với tham số `--shared`.
 
 	$ ssh user@git.example.com
 	$ cd /opt/git/my_project.git
 	$ git init --bare --shared
 
-You see how easy it is to take a Git repository, create a bare version, and place it on a server to which you and your collaborators have SSH access. Now you’re ready to collaborate on the same project.
+Bạn đã thấy việc tạo một kho chứa Git, tạo một phiên bản rỗng, và đưa nó lên máy chủ nơi bạn và các đồng nghiệp khác có quyền truy cập thông qua SSH dễ dàng như thế nào. Bây giờ thì bạn đã sẵn sàng để cộng tác với mọi người trên cùng một dự án.
 
-It’s important to note that this is literally all you need to do to run a useful Git server to which several people have access — just add SSH-able accounts on a server, and stick a bare repository somewhere that all those users have read and write access to. You’re ready to go — nothing else needed.
+Tôi nên nhắc lại rằng, đây là tất cả những gì bạn cần phải làm để có thể chạy một máy chủ Git có khả năng cho phép nhiều người dùng cùng truy cập - chỉ bằng cách tạo mới các tài khoản có quyền truy cập vào máy chủ thông qua SSH, và lưu kho chứa rỗng ở một nơi nào đó mà mọi người dùng đều có quyền đọc và ghi. Vậy là bạn đã sẵn sàng - không cần thêm bất cứ gì khác. 
 
-In the next few sections, you’ll see how to expand to more sophisticated setups. This discussion will include not having to create user accounts for each user, adding public read access to repositories, setting up web UIs, using the Gitosis tool, and more. However, keep in mind that to collaborate with a couple of people on a private project, all you _need_ is an SSH server and a bare repository.
+Trong vài phần tới, bạn sẽ học được nhiều cách cài đặt khác phức tạp hơn. Bao gồm tạo mới tài khoản cho từng người dùng, thêm quyền đọc cho các kho chứa, cài đặt giao diện web, sử dụng các công cụ của Git và nhiều hơn thế nữa. Tuy nhiên, hãy nhớ là để cộng tác với một nhóm nhỏ trên một dự án riêng tư/cá nhân, tất cả những gì bạn _cần_ là một máy chủ SSH và một kho chứa rỗng.
 
-### Small Setups ###
+### Các Cài Đặt Nhỏ ###
 
-If you’re a small outfit or are just trying out Git in your organization and have only a few developers, things can be simple for you. One of the most complicated aspects of setting up a Git server is user management. If you want some repositories to be read-only to certain users and read/write to others, access and permissions can be a bit difficult to arrange.
+Nếu bạn muốn sử dụng Git cho công ty của bạn ở mức độ chỉ có vài lập trình viên, thì mọi việc sẽ rất đơn giản. Một trong những khía cách phức tạp nhất của việc cài đặt máy chủ Git là quản lý người dùng. Nếu bạn muốn phân quyền chỉ đọc cho một số người dùng và quyền đọc/ghi cho một số khác, thì việc truy cập cũng như phân quyền có thể hơi phức tạp một chút.
 
-#### SSH Access ####
+#### Truy Cập SSH ####
 
-If you already have a server to which all your developers have SSH access, it’s generally easiest to set up your first repository there, because you have to do almost no work (as we covered in the last section). If you want more complex access control type permissions on your repositories, you can handle them with the normal filesystem permissions of the operating system your server runs.
+Nếu như bạn đã có một máy chủ mà tất cả các lập trình viên đều có quyền truy cập thông qua SSH, thì việc cài đặt kho chứa đầu tiên cơ bản là dễ nhất, vì bạn gần như không phải làm gì cả (như đã trình bày trong phần trước). Nếu bạn muốn quản lý quyền cũng như truy cập phức tạp hơn, thì bạn có thể quản lý dựa trên cách phân quyền thông thường đối với các tập tin của chính hệ điều hành mà máy chủ của bạn đang sử dụng.
 
-If you want to place your repositories on a server that doesn’t have accounts for everyone on your team whom you want to have write access, then you must set up SSH access for them. We assume that if you have a server with which to do this, you already have an SSH server installed, and that’s how you’re accessing the server.
+Nếu bạn muốn đặt các kho chứa của bạn trên một máy chủ mà người bạn muốn phân quyền đọc/ghi lại không có tài khoản để truy cập vào máy chủ đó, thì bạn phải cài đặt truy cập SSH cho họ. Giả sử rằng bạn có một máy chủ đã được cài đặt sẵn "máy chủ SSH", và bạn cũng đang truy cập vào máy chủ đó thông qua SSH.
 
-There are a few ways you can give access to everyone on your team. The first is to set up accounts for everybody, which is straightforward but can be cumbersome. You may not want to run `adduser` and set temporary passwords for every user.
+Có một số cách để bạn có thể phân quyền truy cập cho tất cả thành viên trong nhóm của bạn. Cách đầu tiên là cài đặt tài khoản cho tất cả các thành viên, cách này khá đơn giản nhưng lại cồng kềnh, không hiệu quả. Có thể bạn không muốn chạy lệnh `adduser` và đặt mật khẩu cho từng thành viên trong nhóm.
 
-A second method is to create a single 'git' user on the machine, ask every user who is to have write access to send you an SSH public key, and add that key to the `~/.ssh/authorized_keys` file of your new 'git' user. At that point, everyone will be able to access that machine via the 'git' user. This doesn’t affect the commit data in any way — the SSH user you connect as doesn’t affect the commits you’ve recorded.
+Cách thứ hai là tạo một người dùng 'git' trên máy chủ đó, yêu cầu mọi thành viên có quyền ghi gửi cho bạn khóa SSH công khai, và thêm khóa đó vào tập tin `~/.ssh/authorized_keys` của tài khoản 'git' mà bạn vừa tạo. Bây giờ thì mọi thành viên đều có thể truy cập vào máy chủ thông qua tài khoản 'git' đó. Việc này cũng không hề ảnh hưởng đến dữ liệu commit - tài khoản SSH mà bạn dùng để kết nối sẽ không ảnh hưởng đến các commit.
 
-Another way to do it is to have your SSH server authenticate from an LDAP server or some other centralized authentication source that you may already have set up. As long as each user can get shell access on the machine, any SSH authentication mechanism you can think of should work.
+Một cách khác để thực hiện là xác thực máy chủ SSH của bạn thông qua một máy chủ LDAP hoặc một nguồn xác thực trung tâm (centralized authentication) nào đó mà bạn đã cài đặt. Miễn là mỗi thành viên có thể truy cập vào máy đó thông qua shell, bất kỳ cơ chế xác thực SSH nào mà bạn biết cũng hoạt động tốt.
 
-## Generating Your SSH Public Key ##
+## Tạo Khóa SSH Công Khai ##
 
-That being said, many Git servers authenticate using SSH public keys. In order to provide a public key, each user in your system must generate one if they don’t already have one. This process is similar across all operating systems.
-First, you should check to make sure you don’t already have a key. By default, a user’s SSH keys are stored in that user’s `~/.ssh` directory. You can easily check to see if you have a key already by going to that directory and listing the contents:
+Như đã được đề cập, nhiều máy chủ Git xác thực sử dụng khóa SSH công khai (SSH public key). Để cung cấp một khóa công khai, từng người dùng trong hệ thống của bạn phải tạo một khóa riêng nếu chưa có. Quá trình này tương tự nhau trên tất cả hệ điều hành.
+Đầu tiên, bạn nên kiểm tra để chắc chắn rằng bạn chưa có khóa nào trước đó. Mặc định, các khóa SSH của một người dùng nào đó được lưu trong thư mục `~/.ssh`. Bạn có thể dễ dàng kiểm tra xem bạn đã có khóa nào hay chưa bằng việc vào thư mục đó và liệt kê nội dung của nó:
 
 	$ cd ~/.ssh
 	$ ls
 	authorized_keys2  id_dsa       known_hosts
 	config            id_dsa.pub
+
+Bạn cần kiểm tra một cặp (2 tập tin) có tên something và something.pub, 
 
 You’re looking for a pair of files named something and something.pub, where the something is usually `id_dsa` or `id_rsa`. The `.pub` file is your public key, and the other file is your private key. If you don’t have these files (or you don’t even have a `.ssh` directory), you can create them by running a program called `ssh-keygen`, which is provided with the SSH package on Linux/Mac systems and comes with the MSysGit package on Windows:
 
