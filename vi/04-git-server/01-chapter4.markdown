@@ -174,9 +174,7 @@ Như đã được đề cập, nhiều máy chủ Git xác thực sử dụng k
 	authorized_keys2  id_dsa       known_hosts
 	config            id_dsa.pub
 
-Bạn cần kiểm tra một cặp (2 tập tin) có tên something và something.pub, 
-
-You’re looking for a pair of files named something and something.pub, where the something is usually `id_dsa` or `id_rsa`. The `.pub` file is your public key, and the other file is your private key. If you don’t have these files (or you don’t even have a `.ssh` directory), you can create them by running a program called `ssh-keygen`, which is provided with the SSH package on Linux/Mac systems and comes with the MSysGit package on Windows:
+Bạn cần kiểm tra một cặp (2 tập tin) có tên something và something.pub, something ở đây thường là `id_dsa` hoặc `id_rsa`. Tập tin `.pub` chính là khóa công khai của bạn, và tập tin còn lại là khóa riêng tư. Nếu như bạn không có những tập tin này (hoặc bạn không có thư mục `.ssh`), bạn có thể tạo ra chúng bằng cách chạy một chương trình có tên `ssh-keygen`, được cung cấp cùng với gói SSH trên các hệ thống sử dụng Linux/Mac hay gói MSysGit trên Windows:
 
 	$ ssh-keygen
 	Generating public/private rsa key pair.
@@ -188,9 +186,9 @@ You’re looking for a pair of files named something and something.pub, where th
 	The key fingerprint is:
 	43:c5:5b:5f:b1:f1:50:43:ad:20:a6:92:6a:1f:9a:3a schacon@agadorlaptop.local
 
-First it confirms where you want to save the key (`.ssh/id_rsa`), and then it asks twice for a passphrase, which you can leave empty if you don’t want to type a password when you use the key.
+Trước tiên nó khẳng định lại nơi mà bạn muốn lưu khóa (`.ssh/id_rsa`), và sau đó nó hỏi bạn cụm mật khẩu (passphrase) hai lần, nhưng bạn có thể để trống nếu như bạn không muốn phải gõ mật khẩu khi sử dụng khóa.
 
-Now, each user that does this has to send their public key to you or whoever is administrating the Git server (assuming you’re using an SSH server setup that requires public keys). All they have to do is copy the contents of the `.pub` file and e-mail it. The public keys look something like this:
+Bây giờ, mỗi thành viên sau khi thực hiện xong việc này phải gửi khóa công khai của họ cho bạn hoặc người quản lý máy chủ Git (giả sử bạn đang cài đặt máy chủ SSH có yêu cầu khóa công khai - cách 2). Tất cả những gì họ phải làm là copy nội dụng của tập tin `.pub` và gửi cho bạn qua email. Các khóa công khai có định dạng như sau:
 
 	$ cat ~/.ssh/id_rsa.pub
 	ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAklOUpkDHrfHY17SbrmTIpNLTGK9Tjom/BWDSU
@@ -200,18 +198,18 @@ Now, each user that does this has to send their public key to you or whoever is 
 	mZ+AW4OZPnTPI89ZPmVMLuayrD2cE86Z/il8b+gw3r3+1nKatmIkjn2so1d01QraTlMqVSsbx
 	NrRFi9wrf+M7Q== schacon@agadorlaptop.local
 
-For a more in-depth tutorial on creating an SSH key on multiple operating systems, see the GitHub guide on SSH keys at `http://github.com/guides/providing-your-ssh-key`.
+Để xem hướng dẫn chi tiết hơn về việc tạo khóa SSH trên các hệ điều hành khác nhau, bạn có thể xem hướng dẫn về khóa SSH trên GitHub tại địa chỉ `http://github.com/guides/providing-your-ssh-key`.
 
-## Setting Up the Server ##
+## Cài Đặt Máy Chủ ##
 
-Let’s walk through setting up SSH access on the server side. In this example, you’ll use the `authorized_keys` method for authenticating your users. We also assume you’re running a standard Linux distribution like Ubuntu. First, you create a 'git' user and a `.ssh` directory for that user.
+Chúng ta hãy cùng xem qua hướng dẫn cấu hình SSH trên máy chủ. Trong ví dụ này, bạn sẽ sử dụng phương pháp `authorized_keys` cho việc xác thực người dùng. Chúng ta cũng sẽ giả sử rằng bạn đang chạy một phát hành chuẩn của Linux như Ubuntu. Trước tiên, bạn tạo một tài khoản người dùng 'git' và một thư mục `.ssh` cho người dùng đó.
 
 	$ sudo adduser git
 	$ su git
 	$ cd
 	$ mkdir .ssh
 
-Next, you need to add some developer SSH public keys to the `authorized_keys` file for that user. Let’s assume you’ve received a few keys by e-mail and saved them to temporary files. Again, the public keys look something like this:
+Tiếp theo, bạn cần phải thêm một số khóa công khai của các lập trình viên vào tập tin `authorized_keys` cho người dùng đó. Giả sử rằng bạn đã nhận được một số khóa bằng email và lưu nó vào một tập tin tạm thời nào đó. Nhắc lại là khóa công khai có định dạng tương tự như sau:
 
 	$ cat /tmp/id_rsa.john.pub
 	ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCB007n/ww+ouN4gSLKssMxXnBOvf9LGt4L
@@ -221,20 +219,20 @@ Next, you need to add some developer SSH public keys to the `authorized_keys` fi
 	O7TCUSBdLQlgMVOFq1I2uPWQOkOWQAHukEOmfjy2jctxSDBQ220ymjaNsHT4kgtZg2AYYgPq
 	dAv8JggJICUvax2T9va5 gsg-keypair
 
-You just append them to your `authorized_keys` file:
+Bạn chỉ cần thêm nó vào tập tin `authorized_keys` của bạn:
 
 	$ cat /tmp/id_rsa.john.pub >> ~/.ssh/authorized_keys
 	$ cat /tmp/id_rsa.josie.pub >> ~/.ssh/authorized_keys
 	$ cat /tmp/id_rsa.jessica.pub >> ~/.ssh/authorized_keys
 
-Now, you can set up an empty repository for them by running `git init` with the `--bare` option, which initializes the repository without a working directory:
+Bây giờ, bạn có thể cài đặt một kho chứa rỗng cho họ bằng việc chạy lệnh `git init` với tham số `--bare`, lệnh này sẽ khởi tạo một kho chứa mà không có thư mục làm việc:
 
 	$ cd /opt/git
 	$ mkdir project.git
 	$ cd project.git
 	$ git --bare init
 
-Then, John, Josie, or Jessica can push the first version of their project into that repository by adding it as a remote and pushing up a branch. Note that someone must shell onto the machine and create a bare repository every time you want to add a project. Let’s use `gitserver` as the hostname of the server on which you’ve set up your 'git' user and repository. If you’re running it internally, and you set up DNS for `gitserver` to point to that server, then you can use the commands pretty much as is:
+Sau đó, John, Josie, hay Jessica có thể push phiên bản đầu tiên của dự án của họ vào kho chứa đó bằng cách thêm nó vào như là một remote và push lên một nhánh. Lưu ý rằng, người dùng nào đó phải truy cập (shell) vào máy chủ và tạo một kho chứa rỗng mỗi khi bạn muốn thêm một dự án mới. Hãy sử dụng `gitserver` làm tên cho máy chủ của chúng ta nơi mà bạn vừa cấu hình tài khoản 'git' và kho chứa. Nếu như bạn đang chạy nội bộ và bạn càu đặt DNS cho `gitsever` trỏ tới máy chủ đó, thì bạn có thể sử dụng các câu lệnh tương tự như sau:
 
 	# on Johns computer
 	$ cd myproject
@@ -244,7 +242,7 @@ Then, John, Josie, or Jessica can push the first version of their project into t
 	$ git remote add origin git@gitserver:/opt/git/project.git
 	$ git push origin master
 
-At this point, the others can clone it down and push changes back up just as easily:
+Đến thời điểm này, các thành viên khác có thể clone nó xuống và push các thay đổi ngược lên một cách dễ dàng:
 
 	$ git clone git@gitserver:/opt/git/project.git
 	$ cd project
@@ -252,47 +250,47 @@ At this point, the others can clone it down and push changes back up just as eas
 	$ git commit -am 'fix for the README file'
 	$ git push origin master
 
-With this method, you can quickly get a read/write Git server up and running for a handful of developers.
+Với phương pháp này, bạn có thể nhanh chóng có được một máy chủ Git được cấu hình đọc/ghi hoàn thiện cho một nhóm nhỏ lập trình viên.
 
-As an extra precaution, you can easily restrict the 'git' user to only doing Git activities with a limited shell tool called `git-shell` that comes with Git. If you set this as your 'git' user’s login shell, then the 'git' user can’t have normal shell access to your server. To use this, specify `git-shell` instead of bash or csh for your user’s login shell. To do so, you’ll likely have to edit your `/etc/passwd` file:
+Bạn cũng nên lưu ý rằng bạn có thể dễ dàng hạn chế người dùng 'git' chỉ được phép thực hiện các thao tác có liên quan đến Git bằng cách sử dụng một công cụ đã được giới hạn chức năng có tên là `git-shell` được cung cấp sẵn trong Git. Nếu như bạn cấu hình nó trở thành shell mặc định khi đăng nhập cho người dùng 'git' thì người dùng 'git' này sẽ không thể truy cập vào máy của bạn như shell thông thường. Để sử dụng tính năng này, bạn cần chỉ định `git-shell` thay vì bash hoặc csh làm shell mặc định cho người dùng đó. Bạn cần phải sửa lại tập tin `/etc/passwd`:
 
 	$ sudo vim /etc/passwd
 
-At the bottom, you should find a line that looks something like this:
+Ở phía cuối cùng, bạn sẽ thấy một dòng tương tự như sau:
 
 	git:x:1000:1000::/home/git:/bin/sh
 
-Change `/bin/sh` to `/usr/bin/git-shell` (or run `which git-shell` to see where it’s installed). The line should look something like this:
+Hãy sửa `/bin/sh` thành `/usr/bin/git-shell` (hoặc chạy `which git-shell` để xem nó được cài đặt ở đâu). Sau khi sửa, nó sẽ giống như sau:
 
 	git:x:1000:1000::/home/git:/usr/bin/git-shell
 
-Now, the 'git' user can only use the SSH connection to push and pull Git repositories and can’t shell onto the machine. If you try, you’ll see a login rejection like this:
+Bây giờ tài khoàn người dùng 'git' chỉ có thể sử dụng kết nối SSH để đọc và ghi dữ liệu vào các kho chứa mà không thể truy cập (shell) vào máy của bạn nữa. Nếu bạn thử, bạn sẽ nhận được một thông báo từ chối như sau:
 
 	$ ssh git@gitserver
 	fatal: What do you think I am? A shell?
 	Connection to gitserver closed.
 
-## Public Access ##
+## Truy Cập Công Khai ##
 
-What if you want anonymous read access to your project? Perhaps instead of hosting an internal private project, you want to host an open source project. Or maybe you have a bunch of automated build servers or continuous integration servers that change a lot, and you don’t want to have to generate SSH keys all the time — you just want to add simple anonymous read access.
+Nếu như bạn muốn truy cập ẩn danh để đọc dự án của bạn thì sẽ như thế nào? Có thể thay vì việc tự lưu trữ một dự án cá nhân, bạn lại muốn lưu trữ một dự án mã nguồn mở. Hoặc cũng có thể bạn có một loạt máy chủ tự biên dịch hoặc tích hợp liên tục có rất nhiều thay đổi xảy ra, và bạn không muốn phải tạo khóa SSH mỗi lần truy cập - bạn đơn giản chỉ muốn đọc nó mà không phải qua bước xác thực người dùng.
 
-Probably the simplest way for smaller setups is to run a static web server with its document root where your Git repositories are, and then enable that `post-update` hook we mentioned in the first section of this chapter. Let’s work from the previous example. Say you have your repositories in the `/opt/git` directory, and an Apache server is running on your machine. Again, you can use any web server for this; but as an example, we’ll demonstrate some basic Apache configurations that should give you an idea of what you might need.
+Chắc chắn cách đơn giản nhất cho các dự án nhỏ là chạy một máy chủ web tĩnh mà thư mục gốc trùng với thư mục các kho chứa, và sau đó kích hoạt "móc" `post-update` mà chúng ta đã đề cập đến ở phần đầu của chương này. Hãy cùng sử dụng lại ví dụ trước. Giả sử bạn lưu các kho chứa trong thư mục `/opt/git`, và có một máy chủ Apache đang chạy. Tôi xin nhắc lại một lần nữa rằng bạn có thể sử dụng bất kỳ máy chủ web nào cho việc này; nhưng trong ví dụ này, một số cấu hình Apache cơ bản có thể gợi ý cho bạn cái mà bạn cần:
 
-First you need to enable the hook:
+Trước tiên bạn cần kích hoạt `pót-update` hook:
 
 	$ cd project.git
 	$ mv hooks/post-update.sample hooks/post-update
 	$ chmod a+x hooks/post-update
 
-What does this `post-update` hook do? It looks basically like this:
+Vậy `post-update` hook này làm gì? Cơ bản nó giống như thực hiện các lệnh sau:
 
 	$ cat .git/hooks/post-update
 	#!/bin/sh
 	exec git-update-server-info
 
-This means that when you push to the server via SSH, Git will run this command to update the files needed for HTTP fetching.
+Điều này có nghĩa là khi bạn push lên máy chủ thông qua SSH, Git sẽ chạy các lệnh này để cập nhật các tập tin cần thiết phục vụ cho việc truy xuất thông qua HTTP.
 
-Next, you need to add a VirtualHost entry to your Apache configuration with the document root as the root directory of your Git projects. Here, we’re assuming that you have wildcard DNS set up to send `*.gitserver` to whatever box you’re using to run all this:
+Tiếp theo, bạn cần phải thêm một bản ghi VirtualHost vào trong cấu hình của Apache chỉ định thư mục gốc của web cũng là thư mục của dự án Git. Ở đây chúng ta giả sử rằng bạn cài đặt DNS để trỏ `*.gitserver` đến một máy bất kỳ nào đó nơi bạn đang chạy tất cả những thứ này (máy này :D):
 
 	<VirtualHost *:80>
 	    ServerName git.gitserver
@@ -303,34 +301,34 @@ Next, you need to add a VirtualHost entry to your Apache configuration with the 
 	    </Directory>
 	</VirtualHost>
 
-You’ll also need to set the Unix user group of the `/opt/git` directories to `www-data` so your web server can read-access the repositories, because the Apache instance running the CGI script will (by default) be running as that user:
+Bạn cũng cần phải cài đặt nhóm người dùng Unix cho thư mục `/opt/git` cho `www-data` để cho máy chủ web của bạn có thể đọc được các kho chứa, bởi vì mặc định Apache chạy các mã CGI bằng tài khoản đó: 
 
 	$ chgrp -R www-data /opt/git
 
-When you restart Apache, you should be able to clone your repositories under that directory by specifying the URL for your project:
+Sau khi khởi động lại Apache, bạn có thể clone các kho chứa trong thư mục đó bằng cách chỉ định đường dẫn tới dự án bạn cần:
 
 	$ git clone http://git.gitserver/project.git
 
-This way, you can set up HTTP-based read access to any of your projects for a fair number of users in a few minutes. Another simple option for public unauthenticated access is to start a Git daemon, although that requires you to daemonize the process - we’ll cover this option in the next section, if you prefer that route.
+Theo các này, bạn có thể cho phép truy cập chỉ đọc dựa trên HTTP cho bất kỳ dự án nào cho với một lượng người dùng tương đối chỉ trong vài phút. Một lựa chọn đơn giản khác cho việc truy cập không cần xác thực là kích hoạt một Git daemon, mặc dù cách này đòi hỏi bạn phải ngầm hóa quá trình chạy - chúng ta sẽ đề cập về lựa chọn này trong phần tới, nếu như bạn ưa thích phương pháp đó hơn.
 
 ## GitWeb ##
 
-Now that you have basic read/write and read-only access to your project, you may want to set up a simple web-based visualizer. Git comes with a CGI script called GitWeb that is commonly used for this. You can see GitWeb in use at sites like `http://git.kernel.org` (see Figure 4-1).
+Bây giờ bạn đã có thể truy cập được vào dự án của bạn thông qua hai hình thức là chỉ-đọc và đọc/ghi, có thể bạn muốn cài đặt thêm một công cụ trực quan hóa dựa trên nền web. Git cung cấp sẵn một đoạn mã CGI được thiết kế riêng cho mục đích này có tên GitWeb. Bạn có thể xem GitWeb hoạt động ra sao tại trang web `http://git.kernel.org` (xem Hình 4-1).
 
 Insert 18333fig0401.png
-Figure 4-1. The GitWeb web-based user interface.
+Hình 4-1. Giao diện người dùng của GitWeb.
 
-If you want to check out what GitWeb would look like for your project, Git comes with a command to fire up a temporary instance if you have a lightweight server on your system like `lighttpd` or `webrick`. On Linux machines, `lighttpd` is often installed, so you may be able to get it to run by typing `git instaweb` in your project directory. If you’re running a Mac, Leopard comes preinstalled with Ruby, so `webrick` may be your best bet. To start `instaweb` with a non-lighttpd handler, you can run it with the `--httpd` option.
+Nếu bạn muốn tìm hiểu xem GitWeb hoạt động như thế nào trên dự án của bạn, Git cung cấp một câu lệnh để khởi động một máy chủ web đơn giản tạm thời trên hệ thống của bạn như `lighttpd` hoặc `webrick`. Trên các máy chạy Linux, `lighttpd` thường đã được cài đặt sẵn, vì thế bạn có thể có khả năng khởi động nó lên bằng cách chạy lệnh `git instaweb` từ thư mục dự án của bạn. Nếu bạn đang sử dụng Mac, Leopard đã được cài đặt sẵn Ruby, do vậy `webrick` có thể là lựa chọn tốt nhất. Để chạy `instaweb` với non-lighttpd handler, bạn có thể chạy nó với tham số `--httpd`:
 
 	$ git instaweb --httpd=webrick
 	[2009-02-21 10:02:21] INFO  WEBrick 1.3.1
 	[2009-02-21 10:02:21] INFO  ruby 1.8.6 (2008-03-03) [universal-darwin9.0]
 
-That starts up an HTTPD server on port 1234 and then automatically starts a web browser that opens on that page. It’s pretty easy on your part. When you’re done and want to shut down the server, you can run the same command with the `--stop` option:
+Lệnh này sẽ khởi động một máy chủ HTTPD trên cổng 1234 và sau đó tự khởi động trình duyệt và truy cập vào trang đó. Phần việc của bạn khá đơn giản. Sau khi xem xong, để tắt máy chủ đó đi bạn chạy lệnh tương tự với tham số `--stop`:
 
 	$ git instaweb --httpd=webrick --stop
 
-If you want to run the web interface on a server all the time for your team or for an open source project you’re hosting, you’ll need to set up the CGI script to be served by your normal web server. Some Linux distributions have a `gitweb` package that you may be able to install via `apt` or `yum`, so you may want to try that first. We’ll walk though installing GitWeb manually very quickly. First, you need to get the Git source code, which GitWeb comes with, and generate the custom CGI script:
+Nếu bạn muốn chạy máy chủ web liên tục cho các thành viên trong nhóm hoặc cho một dự án mã nguồn mở bạn đang lưu trữ, bạn cần phải cài đặt sao cho đoạn mã CGI đó được chạy bởi một máy chủ web thông thường. Một số phiên bản của Linux có gói `gitweb` cho bạn có thể cài đặt thông qua `apt` hoặc `yum`, do vậy hãy thử cách đó trước. Bây giờ chúng ta sẽ cùng cài đặt nhanh chóng GitWeb theo cách thủ công. Trước hết, bạn cần có mã nguồn của Git, nơi có chứa GitWeb, và tạo một đoạn mã CGI:
 
 	$ git clone git://git.kernel.org/pub/scm/git/git.git
 	$ cd git/
@@ -338,7 +336,7 @@ If you want to run the web interface on a server all the time for your team or f
 	        prefix=/usr gitweb
 	$ sudo cp -Rf gitweb /var/www/
 
-Notice that you have to tell the command where to find your Git repositories with the `GITWEB_PROJECTROOT` variable. Now, you need to make Apache use CGI for that script, for which you can add a VirtualHost:
+Chú ý rằng bạn phải nói cho câu lệnh trên biết phải tìm các kho chứa Git của bạn ở đâu bằng cách sử dụng biến `GITWEB_PROJECTROOT`. Bây giờ bạn cần làm cho Apache sử dụng CGI cho đoạn mã đó, sau đó chúng ta mới có thể thêm VirtualHost:
 
 	<VirtualHost *:80>
 	    ServerName gitserver
@@ -353,65 +351,65 @@ Notice that you have to tell the command where to find your Git repositories wit
 	    </Directory>
 	</VirtualHost>
 
-Again, GitWeb can be served with any CGI capable web server; if you prefer to use something else, it shouldn’t be difficult to set up. At this point, you should be able to visit `http://gitserver/` to view your repositories online, and you can use `http://git.gitserver` to clone and fetch your repositories over HTTP.
+Cần nhắc lại là GitWeb có thể chạy được với bất kỳ máy chủ web nào có khả năng chạy mã CGI; nếu bạn muốn dùng một loại máy chủ khác, thì cũng không quá khó để cài đặt. Bây giờ bạn đã có thể truy cập vào `http://gitserver/` để xem các kho chứa của bạn, và sử dụng `http://gitserver/` để clone và fetch khác kho chứa thông qua HTTP.
 
 ## Gitosis ##
 
-Keeping all users’ public keys in the `authorized_keys` file for access works well only for a while. When you have hundreds of users, it’s much more of a pain to manage that process. You have to shell onto the server each time, and there is no access control — everyone in the file has read and write access to every project.
+Lưu trữ tất cả khóa công khai của người dùng trong tập tin `authorized_keys` phục vụ cho mục đích truy cập chỉ hiệu quả trong một thời gian ngắn. Khi bạn có tới hàng trăm người dùng, việc quản lý sẽ trở nên rất khó khăn. Bạn phải truy cập vào máy chủ mỗi lần, cũng như không thể quản lý được quyền truy cập - mọi người dùng có trong tập tin đó đều có quyền đọc và ghi trên mọi dự án.
 
-At this point, you may want to turn to a widely used software project called Gitosis. Gitosis is basically a set of scripts that help you manage the `authorized_keys` file as well as implement some simple access controls. The really interesting part is that the UI for this tool for adding people and determining access isn’t a web interface but a special Git repository. You set up the information in that project; and when you push it, Gitosis reconfigures the server based on that, which is cool.
+Cách giải quyết cho bạn lúc này là chuyển sang dùng một phần mềm quản lý phổ biến có ten là Gitosis. Gitosis cơ bản là một tập hợp các đoạn mã giúp bạn quản lý tập tin `authorized_keys` cũng như cung cấp một số tính năng phân quyền truy cập đơn giản. Điều thú vị ở đây là giao diện phần thêm mới người dùng cũng như phân quyền truy cập của phần mềm này không phải là giao diện web mà nó lại là một kho chứa Git đặc biệt. Bạn cấu hình các thông tin cần thiết ở trong dự án đó; sau đó push nó lên, Gitosis sẽ tự cấu hình lại máy chủ dựa trên những thông tin đó. Thật tuyệt phải không nào.
 
-Installing Gitosis isn’t the simplest task ever, but it’s not too difficult. It’s easiest to use a Linux server for it — these examples use a stock Ubuntu 8.10 server.
+Cài đặt Gitosis không phải là thao tác đơn giản nhất, nhưng cũng không hề quá khó. Cách đơn giản nhất là sử dụng một máy chủ Linux cho nó - các ví dụ sau sử dụng một máy chủ chạy Ubuntu 8.10 nguyên bản.
 
-Gitosis requires some Python tools, so first you have to install the Python setuptools package, which Ubuntu provides as python-setuptools:
+Gitosis yêu cầu một số công cụ được viết bằng Python, do vậy việc đầu tiên bạn phải cài đặt gói Python setuptools, được cung cấp trên Ubuntu với tên python-setuptools:
 
 	$ apt-get install python-setuptools
 
-Next, you clone and install Gitosis from the project’s main site:
+Tiếp theo, bạn clone và cài đặt Gitosis từ trang web chính thức của dự án:
 
 	$ git clone git://eagain.net/gitosis.git
 	$ cd gitosis
 	$ sudo python setup.py install
 
-That installs a couple of executables that Gitosis will use. Next, Gitosis wants to put its repositories under `/home/git`, which is fine. But you have already set up your repositories in `/opt/git`, so instead of reconfiguring everything, you create a symlink:
+Lệnh này sẽ cài đặt một số chương trình mà Gitosis cần sử dụng tới. Tiếp theo, Gitosis đòi hỏi phải đặt kho chứa của nó vào thư mục `/home/git`, điều này hoàn toàn chấp nhận được. Nhưng bạn đã cài đặt các kho chứa của bạn ở thư mục `/opt/git` từ trước, do vậy thay vì cấu hình lại mọi thứ, bạn chỉ cần tạo một symlink:
 
 	$ ln -s /opt/git /home/git/repositories
 
-Gitosis is going to manage your keys for you, so you need to remove the current file, re-add the keys later, and let Gitosis control the `authorized_keys` file automatically. For now, move the `authorized_keys` file out of the way:
+Gitosis sẽ quản lý các khóa cho bạn, vì thế bạn cần phải xóa tập tin hiện tại đi, thêm lại các khóa sau đó, và để Gitosis tự động quản lý tập tin `authorized_keys`. Bây giờ hãy di chuyển tập tin `authorized_keys` sang một nơi khác:
 
 	$ mv /home/git/.ssh/authorized_keys /home/git/.ssh/ak.bak
 
-Next you need to turn your shell back on for the 'git' user, if you changed it to the `git-shell` command. People still won’t be able to log in, but Gitosis will control that for you. So, let’s change this line in your `/etc/passwd` file
+Tiếp theo bạn cẩn phải kích hoạt lại shell cho tài khoản 'git', nếu như bạn đổi nó thành `git-shell` trước đây. Các thành viên vẫn sẽ không thể truy cập vào máy chủ, Gitosis sẽ quản lý việc này cho bạn. Thế nên hãy sửa dòng sau trong tập tin `/etc/passwd`:
 
 	git:x:1000:1000::/home/git:/usr/bin/git-shell
 
-back to this:
+thành như sau:
 
 	git:x:1000:1000::/home/git:/bin/sh
 
-Now it’s time to initialize Gitosis. You do this by running the `gitosis-init` command with your personal public key. If your public key isn’t on the server, you’ll have to copy it there:
+Bây giờ đến lúc khởi tạo Gitosis. Bạn thực hiện việc này bằng cách chạy lệnh `gitosis-init` với khóa công khai riêng của bạn. Nếu nó không tồn tại trên máy chủ, bạn sẽ phải copy nó lên:
 
 	$ sudo -H -u git gitosis-init < /tmp/id_dsa.pub
 	Initialized empty Git repository in /opt/git/gitosis-admin.git/
 	Reinitialized existing Git repository in /opt/git/gitosis-admin.git/
 
-This lets the user with that key modify the main Git repository that controls the Gitosis setup. Next, you have to manually set the execute bit on the `post-update` script for your new control repository.
+Lệnh này sẽ cho phép người dùng tương ứng với khóa đó chỉnh sửa kho chứa cấu hình của Gitosis. Tiếp theo bạn phải tự thêm quyền thực thi cho mã `post-update` của kho chứa mới.
 
 	$ sudo chmod 755 /opt/git/gitosis-admin.git/hooks/post-update
 
-You’re ready to roll. If you’re set up correctly, you can try to SSH into your server as the user for which you added the public key to initialize Gitosis. You should see something like this:
+Bạn đã sẵn sàng để chạy nó rồi đó. Nếu như bạn cài đặt một cách chính xác thì bạn có thể thử SSH vào máy chủ sử dụng tài khoản mà bạn đã thêm khóa công khai trong quá trình khởi tạo Gitosis. Bạn sẽ nhận được thông báo như sau:
 
 	$ ssh git@gitserver
 	PTY allocation request failed on channel 0
 	fatal: unrecognized command 'gitosis-serve schacon@quaternion'
 	  Connection to gitserver closed.
 
-That means Gitosis recognized you but shut you out because you’re not trying to do any Git commands. So, let’s do an actual Git command — you’ll clone the Gitosis control repository:
+Điều này có nghĩa là Gitosis nhận ra bạn nhưng sau đó lại đóng kết nối của bạn lại vì bạn không chạy một câu lệnh Git nào cả. Vậy thì hãy thực thi một lệnh nào đó thôi - hãy clone chính kho chứa Gitosis:
 
 	# on your local computer
 	$ git clone git@gitserver:gitosis-admin.git
 
-Now you have a directory named `gitosis-admin`, which has two major parts:
+Bây giờ bạn có một thư mục có tên là `gitosis-admin`, bao gồm hai phần cơ bản:
 
 	$ cd gitosis-admin
 	$ find .
@@ -419,9 +417,9 @@ Now you have a directory named `gitosis-admin`, which has two major parts:
 	./keydir
 	./keydir/scott.pub
 
-The `gitosis.conf` file is the control file you use to specify users, repositories, and permissions. The `keydir` directory is where you store the public keys of all the users who have any sort of access to your repositories — one file per user. The name of the file in `keydir` (in the previous example, `scott.pub`) will be different for you — Gitosis takes that name from the description at the end of the public key that was imported with the `gitosis-init` script.
+Tập tin `gitosis.conf` là tập tin mà bạn sẽ dùng để quản lý người dùng, kho chứa, và các quyền. Thư mục `keydir` là nơi dùng để lưu trữ các khóa công khai của tất cả người dùng có bất kỳ ít nhất một quyền truy cập nào đó vào các kho chứa của bạn - một tập tin cho một người dùng. Tên của tập tin trong thư mục `keydir` (trong ví dụ trước là `scott.pub`) sẽ khác cho với của bạn - Gitosis sử dụng tên trong phần mô tả ở cuối khóa công khai được nhập vào qua đoạn mã `gitosis-init`.
 
-If you look at the `gitosis.conf` file, it should only specify information about the `gitosis-admin` project that you just cloned:
+Nếu bạn mở tập tin `gitosis.conf` ra, bạn sẽ thấy nó chỉ chứa thông tin về dự án `gitosis-admin` mà bạn vừa clone:
 
 	$ cat gitosis.conf
 	[gitosis]
@@ -430,15 +428,15 @@ If you look at the `gitosis.conf` file, it should only specify information about
 	writable = gitosis-admin
 	members = scott
 
-It shows you that the 'scott' user — the user with whose public key you initialized Gitosis — is the only one who has access to the `gitosis-admin` project.
+ Nó chỉ ra rằng tài khoản 'scott' - người dụng có khóa công khai được sử dụng khi khởi tạo - là người duy nhất có quyền truy cập vào dự án `gitosis-admin`:
 
-Now, let’s add a new project for you. You’ll add a new section called `mobile` where you’ll list the developers on your mobile team and projects that those developers need access to. Because 'scott' is the only user in the system right now, you’ll add him as the only member, and you’ll create a new project called `iphone_project` to start on:
+Bây giờ hãy tạo một dự án của riêng bạn. Ví dụ bạn sẽ thêm một phần mới có tên `mobile` nơi bạn sẽ liệt kê các lập trình viên trong nhóm mobile và các dự án mà các lập trình đó cần truy cập vào. Bởi vì 'scott' là người dùng duy nhất của hệ thống tại thời điểm hiện tại, nên bạn sẽ thêm tài khoản đó như là thành viên duy nhất, và sau đó tạo một dự án mới có tên `iphone_project` để bắt đầu:
 
 	[group mobile]
 	writable = iphone_project
 	members = scott
 
-Whenever you make changes to the `gitosis-admin` project, you have to commit the changes and push them back up to the server in order for them to take effect:
+Bất cứ khi nào bạn thay đổi một nội dung nào đó trong dự án `gitosis-admin`, bạn phải commit các thay đổi đó và sau đó push nó ngược trở lên máy chủ thì chúng mới có hiệu lực:
 
 	$ git commit -am 'add iphone_project and mobile group'
 	[master]: created 8962da8: "changed name"
@@ -451,7 +449,7 @@ Whenever you make changes to the `gitosis-admin` project, you have to commit the
 	To git@gitserver:/opt/git/gitosis-admin.git
 	   fb27aec..8962da8  master -> master
 
-You can make your first push to the new `iphone_project` project by adding your server as a remote to your local version of the project and pushing. You no longer have to manually create a bare repository for new projects on the server — Gitosis creates them automatically when it sees the first push:
+Bạn có thể tạo push đầu tiên cho dự án mới `iphone_project` bằng cách thêm máy chủ này vào phiên bản nội bộ của bạn với vai trò là một remote. Bạn sẽ không cần phải tạo kho chứa rỗng một cách thủ công cho các dự án mới trên máy chủ nữa - Gitosis sẽ tự động tạo khi nó nhận được push đầu tiên:
 
 	$ git remote add origin git@gitserver:iphone_project.git
 	$ git push origin master
@@ -462,23 +460,23 @@ You can make your first push to the new `iphone_project` project by adding your 
 	To git@gitserver:iphone_project.git
 	 * [new branch]      master -> master
 
-Notice that you don’t need to specify the path (in fact, doing so won’t work), just a colon and then the name of the project — Gitosis finds it for you.
+Chú ý là bạn không cần chỉ định đường dẫn (thực tế, làm như vậy sẽ khiến nó không hoạt động), mà chỉ dùng dấu hai chấm và sau đó là tên của dự án - Gitosis sẽ tự tìm đường dẫn cho bạn.
 
-You want to work on this project with your friends, so you’ll have to re-add their public keys. But instead of appending them manually to the `~/.ssh/authorized_keys` file on your server, you’ll add them, one key per file, into the `keydir` directory. How you name the keys determines how you refer to the users in the `gitosis.conf` file. Let’s re-add the public keys for John, Josie, and Jessica:
+Nếu bạn muốn cộng tác với các đồng nghiệp khác trên dự án này, bạn sẽ phải thêm khóa công khai của họ lại một lần nữa. Nhưng thay vì việc thêm thủ công vào tập tin `~/.ssh/authorized_keys` trên máy chủ, thì bạn sẽ thêm vào thư mục `keydir`, mỗi tập tin chứa một khóa. Cách đặt tên kháo phụ thuộc vào cách bạn gọi đến chúng trong tập tin `gitosis.conf`. Chúng ta sẽ thêm lại khóa công khai cho các thành viên John, Josie, và Jessica:
 
 	$ cp /tmp/id_rsa.john.pub keydir/john.pub
 	$ cp /tmp/id_rsa.josie.pub keydir/josie.pub
 	$ cp /tmp/id_rsa.jessica.pub keydir/jessica.pub
 
-Now you can add them all to your 'mobile' team so they have read and write access to `iphone_project`:
+Bây giờ thì bạn đã có thể thêm tất cả những thành viên này vào nhóm 'mobile', điều này cũng có nghĩa là họ có quyền đọc-ghi trên dự án `iphone_project`:
 
 	[group mobile]
 	writable = iphone_project
 	members = scott john josie jessica
 
-After you commit and push that change, all four users will be able to read from and write to that project.
+Sau khi bạn commit và push thay đổi đó, cả bốn thành viên sẽ có khả năng đọc và ghi trên dự án này.
 
-Gitosis has simple access controls as well. If you want John to have only read access to this project, you can do this instead:
+Gitosis quản lý truy cập khá đơn giản. Nếu bạn chỉ muốn John có quyền đọc dự án này thì bạn có thể làm như sau:
 
 	[group mobile]
 	writable = iphone_project
@@ -488,7 +486,7 @@ Gitosis has simple access controls as well. If you want John to have only read a
 	readonly = iphone_project
 	members = john
 
-Now John can clone the project and get updates, but Gitosis won’t allow him to push back up to the project. You can create as many of these groups as you want, each containing different users and projects. You can also specify another group as one of the members (using `@` as prefix), to inherit all of its members automatically:
+Bây giờ thì John chỉ có thể clone và theo dõi các cập nhật, chứ Gitosis không cho phép anh ta push lên dự án đó. Bạn có thể tạo số lượng nhóm theo ý muốn, mỗi nhóm bao gồm các thành viên và dự án khác nhau. Bạn cũng có thể chỉ định một nhóm trong vai trò là một thành viên của nhóm khác (sử dụng tiền tố `@`), để tận dụng toàn bộ thành viên của nhóm đó:
 
 	[group mobile_committers]
 	members = scott josie jessica
@@ -501,14 +499,16 @@ Now John can clone the project and get updates, but Gitosis won’t allow him to
 	writable  = another_iphone_project
 	members   = @mobile_committers john
 
-If you have any issues, it may be useful to add `loglevel=DEBUG` under the `[gitosis]` section. If you’ve lost push access by pushing a messed-up configuration, you can manually fix the file on the server under `/home/git/.gitosis.conf` — the file from which Gitosis reads its info. A push to the project takes the `gitosis.conf` file you just pushed up and sticks it there. If you edit that file manually, it remains like that until the next successful push to the `gitosis-admin` project.
+Nếu bạn gặp bất kỳ vấn đề gì thì việc thêm `loglevel=DEBUG` vào trong phần `[gitosis]` có thể sẽ hữu ích. Nếu như bạn bị mất quyền push vì lỡ push một cấu hình khác, bạn có thể sửa chữa lại bằng cách thay đổi tập tin `/home/git/.gitosis.conf` - tập tin mà Gitosis đọc các thông tin cấu hình. Mỗi lần push, Gitosis sẽ sử dụng tập tin `gitosis.conf` để đưa vào thư mục đó. Nếu bạn thay đổi tập tin đó thủ công, thì nó sẽ vẫn giữ nguyên trạng thái như vậy cho tới lần push tiếp theo.
 
 ## Gitolite ##
 
-This section serves as a quick introduction to Gitolite, and provides basic installation and setup instructions.  It cannot, however, replace the enormous amount of [documentation][gltoc] that Gitolite comes with.  There may also be occasional changes to this section itself, so you may also want to look at the latest version [here][gldpg].
+Phần này sẽ giới thiệu qua cho bạn về Gitolite, cũng như hướng dẫn cách cấu hình và cài đặt. Tuy nhiên, nó không thể thay thế được [tài liệu][gltoc] có sẵn của Gitolite. Đôi khi nội dung phần này cũng thay đổi, vậy nên có thể bạn muốn xem phiên bản mới nhất tại [đây][gldpg].
 
 [gldpg]: http://sitaramc.github.com/gitolite/progit.html
 [gltoc]: http://sitaramc.github.com/gitolite/master-toc.html
+
+Gitolite là một lớp cấp phép nằm trên cùng của Git, phụ thuộc vào `sshd` và `httpd` để xác thực. (Tóm tắt: xác thực là nhận diện người dùng, cấp phép là quyết định xem người dùng đó có được quyền thực hiện )
 
 Gitolite is an authorization layer on top of Git, relying on `sshd` or `httpd` for authentication.  (Recap: authentication is identifying who the user is, authorization is deciding if he is allowed to do what he is attempting to).
 
