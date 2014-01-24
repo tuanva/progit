@@ -508,36 +508,34 @@ Phần này sẽ giới thiệu qua cho bạn về Gitolite, cũng như hướng
 [gldpg]: http://sitaramc.github.com/gitolite/progit.html
 [gltoc]: http://sitaramc.github.com/gitolite/master-toc.html
 
-Gitolite là một lớp cấp phép nằm trên cùng của Git, phụ thuộc vào `sshd` và `httpd` để xác thực. (Tóm tắt: xác thực là nhận diện người dùng, cấp phép là quyết định xem người dùng đó có được quyền thực hiện )
+Gitolite là một lớp cấp phép nằm trên cùng của Git, phụ thuộc vào `sshd` và `httpd` để xác thực. (Tóm tắt: xác thực là nhận diện người dùng, cấp phép là quyết định xem người dùng đó có được quyền thực hiện một hành động nào đó hay không).
 
-Gitolite is an authorization layer on top of Git, relying on `sshd` or `httpd` for authentication.  (Recap: authentication is identifying who the user is, authorization is deciding if he is allowed to do what he is attempting to).
+Gitolite không chỉ cho phép bạn chỉ định quyền theo kho chứa, mà còn cả nhánh hoặc thẻ (tag) trong mỗi kho chứa. Nghĩa là bạn có thể chỉ định người dùng (hoặc nhóm người dùng) chỉ được phép push vào các "refs" (nhánh hoặc thẻ) nhất định.
 
-Gitolite allows you to specify permissions not just by repository, but also by branch or tag names within each repository.  That is, you can specify that certain people (or groups of people) can only push certain "refs" (branches or tags) but not others.
+### Cài Đặt ###
 
-### Installing ###
+Cài đặt Gitolite rất đơn giản, ngay cả khi bạn không đọc tài liệu hướng dẫn đi kèm. Bạn cần một tài khoản trên một máy chủ Unix nào đó. Bạn không cần có quyền root, giả sử là Git, Perl và một loại máy chủ SSH nào đó đã được cài đặt sẵn. Trong các ví dụ tiếp theo, chúng ta sẽ sử dụng tài khoản `git` trên máy chủ có tên `gitserver`.
 
-Installing Gitolite is very easy, even if you don’t read the extensive documentation that comes with it.  You need an account on a Unix server of some kind.  You do not need root access, assuming Git, Perl, and an OpenSSH compatible SSH server are already installed.  In the examples below, we will use the `git` account on a host called `gitserver`.
+Ở khía cạnh nào đó Gitolite có chút khác biệt với các "máy chủ" khác - truy cập thông qua SSH, do vậy mỗi userid trên máy chủ có thể (potential) đóng vai trò là một "máy chủ Gitolite" (Gitolite host). Chúng ta sẽ sử dụng phương pháp cài đặt đơn giản nhất trong phần này; vui lòng xem các phương pháp cài đặt khác trong tài liệu hướng dẫn (documentation).
 
-Gitolite is somewhat unusual as far as "server" software goes — access is via SSH, and so every userid on the server is a potential "gitolite host".  We will describe the simplest install method in this article; for the other methods please see the documentation.
-
-To begin, create a user called `git` on your server and login to this user.  Copy your SSH public key (a file called `~/.ssh/id_rsa.pub` if you did a plain `ssh-keygen` with all the defaults) from your workstation, renaming it to `<yourname>.pub` (we'll use `scott.pub` in our examples).  Then run these commands:
+Để bắt đầu, hãy tạo mới một tài khoản người dùng có tên `git` trên máy chủ và đăng nhập sử dụng tài khoản này. Copy khóa SSH công khai (tập tin có tên `~/.ssh/id_rsa.pub` nếu bạn chạy `ssh-keygen` với các cài đặt mặc định) từ máy của bạn, đổi tên nó thành `<tenban>.pub` (chúng ta sẽ sử dụng `scott.pub` trong các ví dụ này). Và sau đó chạy các lệnh sau:
 
 	$ git clone git://github.com/sitaramc/gitolite
 	$ gitolite/install -ln
 	    # assumes $HOME/bin exists and is in your $PATH
 	$ gitolite setup -pk $HOME/scott.pub
 
-That last command creates new Git repository called `gitolite-admin` on the server.
+Câu lệnh cuối tạo mới một kho chứa Git có tên `gitolite-admin` trên máy chủ.
 
-Finally, back on your workstation, run `git clone git@gitserver:gitolite-admin`. And you’re done!  Gitolite has now been installed on the server, and you now have a brand new repository called `gitolite-admin` in your workstation.  You administer your Gitolite setup by making changes to this repository and pushing.
+Cuối cùng, quay trở lại với máy của bạn, hãy chạy lệnh `git clone git@gitserver:gitolite-admin`. Vậy là bạn đã xong! Gitolite đã được cài đặt trên máy chủ, và bạn đã có một kho chứa mới là `gitolite-admin` trên máy của mình. Bạn quản lý các cấu hình Gitolite bằng cách thay đổi kho chứa này và push lên.
 
-### Customising the Install ###
+### Tuỳ Chỉnh Cài Đặt ###
 
-While the default, quick, install works for most people, there are some ways to customise the install if you need to.  Some changes can be made simply by editing the rc file, but if that is not sufficient, there’s documentation on customising Gitolite.
+Cài đặt mặc định thường nhanh và đơn giản dành cho đa số mọi người, ngoài ta còn một số cách để tủy chính nó nếu bạn muốn. Bạn có thể dễ dàng thực hiện các thay đổi bằng cách sửa tập tin rc, nếu như vậy vẫn chưa đủ thì bạn có thể đọc thêm tài liệu hướng dẫn về các cách tùy chỉnh Gitolite khác.
 
 ### Config File and Access Control Rules ###
 
-Once the install is done, you switch to the `gitolite-admin` clone you just made on your workstation, and poke around to see what you got:
+Sau khi quá trình cài đặt hoàn tất, bạn có thể duyệt qua kho chứa `gitolute-admin` mà bạn vừa clone để xem bạn có những gì trong đó:
 
 	$ cd ~/gitolite-admin/
 	$ ls
@@ -553,13 +551,13 @@ Once the install is done, you switch to the `gitolite-admin` clone you just made
 	repo testing
 	    RW+                 = @all
 
-Notice that "scott" (the name of the pubkey in the `gitolite setup` command you used earlier) has read-write permissions on the `gitolite-admin` repository as well as a public key file of the same name.
+Lưu tài khoản "scott" (tên của khóa công khai trong lệnh `gitolite setup` bạn sử dụng trước đó) có quyền đọc-ghi trên cả kho chứa `gitolite-admin` này cũng như khóa công khai cùng tên.
 
-Adding users is easy.  To add a user called "alice", obtain her public key, name it `alice.pub`, and put it in the `keydir` directory of the clone of the `gitolite-admin` repo you just made on your workstation.  Add, commit, and push the change, and the user has been added.
+Thêm người dùng mới khá đơn giản. Để thêm một tài khoản mới có tên "alice", bạn cần khóa công khai của cô ấy, đổi tên nó thành `alice.pub`, và sau đó đặt nó vào trong thư mục `keydir` của kho chứa `gitolite-admin` bạn đã clone về máy của bạn. Sử dụng lệnh add, commit, và sau đó là push lên máy chủ, vậy là bạn đã có thêm một người dùng mới.
 
-The config file syntax for Gitolite is well documented, so we’ll only mention some highlights here.
+Cú pháp cho tập tin cấu hình của Gitolite diễn giải rất chi tiết, vì thế tôi chỉ đề cập đến các vấn đề đáng chú ý ở đây.
 
-You can group users or repos for convenience.  The group names are just like macros; when defining them, it doesn’t even matter whether they are projects or users; that distinction is only made when you *use* the "macro".
+Để thuận lợi thì bạn có thể nhóm các kho chứa hoặc người dùng lại với nhau. Tên các nhóm cũng giống như các macro; chúng không nhất thiết phải là các dự án hay người dùng; sự khác nhau chỉ rõ rệt khi bạn *sử dụng* các "macro" đó.
 
 	@oss_repos      = linux perl rakudo git gitolite
 	@secret_repos   = fenestra pear
@@ -569,7 +567,7 @@ You can group users or repos for convenience.  The group names are just like mac
 	@engineers      = sitaram dilbert wally alice
 	@staff          = @admins @engineers @interns
 
-You can control permissions at the "ref" level.  In the following example, interns can only push the "int" branch.  Engineers can push any branch whose name starts with "eng-", and tags that start with "rc" followed by a digit.  And the admins can do anything (including rewind) to any ref.
+Bạn có thể quản lý các quyền ở mức độ "ref". Trong ví dụ sau, các thực tập sinh chỉ có thể push vào nhánh "int". Các kỹ sư có thể push vào bất kỳ nhánh nào có tên bắt đầu bằng "eng-", và các tag bắt đầu bằng "rc" theo sau là một số. Và các quản trị viên có thể làm bất kỳ việc gì (bao gồm cả phục hồi) trên bất kỳ ref nào.
 
 	repo @oss_repos
 	    RW  int$                = @interns
@@ -577,7 +575,9 @@ You can control permissions at the "ref" level.  In the following example, inter
 	    RW  refs/tags/rc[0-9]   = @engineers
 	    RW+                     = @admins
 
-The expression after the `RW` or `RW+` is a regular expression (regex) that the refname (ref) being pushed is matched against.  So we call it a "refex"!  Of course, a refex can be far more powerful than shown here, so don’t overdo it if you’re not comfortable with Perl regexes.
+Biểu thức sau `RW` hoặc `RW+` là một biểu thức chính quy (regex) dùng để so sánh các refname (ref) sẽ được push lên. Do vậy chúng được gọi là "refex"! Tất nhiên, một refex có thể phức tạp và hiệu lực lớn hơn nhiều so với trong ví dụ này, vì thế bạn không nên lạm dụng quá nếu như bạn chưa thực sự thành thạo Perl regex.
+
+
 
 Also, as you probably guessed, Gitolite prefixes `refs/heads/` as a syntactic convenience if the refex does not begin with `refs/`.
 
